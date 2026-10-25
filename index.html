@@ -33,6 +33,10 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
 .let-body{padding:28px 40px 40px;font-size:15px;line-height:1.6;color:#000}.let-meta{display:flex;justify-content:space-between;gap:20px;margin-bottom:22px}.let-dest{font-weight:700}.let-date{font-size:14px;white-space:nowrap}
 .let-obj{margin-bottom:18px;padding:8px 12px;background:var(--peach);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
 .let-body p{margin:0 0 14px;white-space:pre-line;text-align:justify}.let-sign{margin-top:26px;font-weight:900;font-size:18px}
+#atsDoc{display:none}
+@media print{body.ats-print>*:not(#atsDoc){display:none!important}
+body.ats-print #atsDoc{display:block!important;font-family:Arial,Helvetica,sans-serif;font-size:11pt;line-height:1.4;color:#000;background:#fff;padding:16mm 18mm}
+#atsDoc h1{font-size:20pt;margin:0 0 2pt}#atsDoc h2{font-size:12pt;text-transform:uppercase;border-bottom:1px solid #000;margin:14pt 0 5pt;padding-bottom:2pt}#atsDoc p{margin:0 0 4pt}#atsDoc .pl{white-space:pre-line}#atsDoc .aj{margin-bottom:7pt;break-inside:avoid}#atsDoc .at{font-size:13pt}}
 /* ---- CV ---- */
 .paper{background:#fff;border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink);border-radius:4px;width:100%;max-width:794px;margin:auto;min-height:1000px;color:#000}
 .cv-head{background:var(--peach);border-bottom:3px solid var(--ink);padding:28px 34px;display:flex;gap:22px;align-items:center}
@@ -69,7 +73,7 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
 }
 </style></head><body>
 <header><h1>▸ Générateur de CV</h1>
-<div class="bar"><button id="tabCv" class="green">📄 CV</button><button id="tabLet" class="white">✉ Lettre</button><button id="print" class="white">🖨 Imprimer</button><button id="pdf" class="green">⬇ Télécharger PDF</button></div></header>
+<div class="bar"><button id="tabCv" class="green">📄 CV</button><button id="tabLet" class="white">✉ Lettre</button><button id="print" class="white">🖨 Imprimer</button><button id="pdf" class="green">⬇ Télécharger PDF</button><button id="ats" class="white">🤖 Version ATS (PDF)</button></div></header>
 <main>
 <div class="stack">
 <div id="cvForm">
@@ -119,6 +123,7 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
 </div>
 <div class="preview"><div class="paper" id="cv"></div><div class="paper" id="letter" style="display:none"></div></div>
 </main>
+<div id="atsDoc"></div>
 <div id="toast"></div>
 <script>
 const $=id=>document.getElementById(id);
@@ -247,6 +252,42 @@ function tab(t){TAB=t;const c=t==='cv';
  $('tabCv').className=c?'green':'white';$('tabLet').className=c?'white':'green';
  document.querySelectorAll('.stack,.preview').forEach(e=>e.scrollTop=0)}
 $('tabCv').onclick=()=>tab('cv');$('tabLet').onclick=()=>tab('let');
+/* version ATS */
+const atsSec=(t,h)=>h&&!(D.hide||{})[t]?`<h2>${t}</h2>${h}`:'';
+const atsJobs=a=>(a||[]).filter(o=>o.poste||o.lieu).map(o=>`<div class="aj"><p><b>${esc(o.poste)}</b>${o.lieu?` - ${esc(o.lieu)}`:''}${o.periode?` (${esc(o.periode)})`:''}</p>${o.url?`<p>${esc(href(o.url))}</p>`:''}${o.desc?`<p class="pl">${esc(o.desc)}</p>`:''}</div>`).join('');
+const csv=x=>(x||'').split(',').map(v=>v.trim()).filter(Boolean).join(', ');
+function atsCv(){
+ const nm=`${D.prenom||''} ${D.nom||''}`.trim();
+ const ct=[D.email,D.tel,D.ville].filter(Boolean).map(esc).join(' | ');
+ const lk=(D.liens||[]).filter(l=>l.url).map(l=>`${l.poste?esc(l.poste)+' : ':''}${esc(href(l.url))}`).join(' | ');
+ return `<h1>${esc(nm)}</h1>${D.titre?`<p class="at">${esc(D.titre)}</p>`:''}${ct?`<p>${ct}</p>`:''}${lk?`<p>${lk}</p>`:''}`+
+  atsSec('Profil',D.resume?`<p class="pl">${esc(D.resume)}</p>`:'')+
+  atsSec('Compétences',csv(D.comp)&&`<p>${esc(csv(D.comp))}</p>`)+
+  atsSec('Expériences',atsJobs(D.exps))+atsSec('Projets',atsJobs(D.projets))+atsSec('Contributions',atsJobs(D.contribs))+
+  atsSec('Formation',atsJobs(D.forms))+atsSec('Certifications',atsJobs(D.certifs))+atsSec('Ressources',atsJobs(D.ress))+
+  atsSec('Langues',csv(D.langues)&&`<p>${esc(csv(D.langues))}</p>`)+
+  atsSec('Centres d’intérêt',csv(D.interets)&&`<p>${esc(csv(D.interets))}</p>`);
+}
+function atsLetter(){
+ const today=new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+ const ville=D.l_ville||D.ville||'',date=D.l_date||today,nm=`${D.prenom||''} ${D.nom||''}`.trim();
+ const type=D.l_type||'emploi',poste=D.l_poste||D.titre||'';
+ const objet=D.l_objet||(poste?(type==='spontanee'?`Candidature spontanée – ${poste}`:type==='stage'?`Candidature stage / alternance – ${poste}`:`Candidature au poste de ${poste}`):'');
+ const me=[D.ville,D.email,D.tel].filter(Boolean).map(esc).join('<br>');
+ const dest=[D.l_dest,D.l_ent,D.l_adr].filter(Boolean).map(esc).join('<br>');
+ const paras=(D.l_body||'').split(/\n{2,}/).filter(x=>x.trim()).map(x=>`<p class="pl">${esc(x.trim())}</p>`).join('');
+ return `<p><b>${esc(nm)}</b><br>${me}</p><p>${dest}</p><p>${ville?esc(ville)+', le ':'Le '}${esc(date)}</p>${objet?`<p><b>Objet :</b> ${esc(objet)}</p>`:''}<p>${esc(D.l_salut||'Madame, Monsieur,')}</p>${paras}<p><b>${esc(nm)}</b></p>`;
+}
+$('ats').onclick=()=>{
+ const isL=TAB==='let';
+ $('atsDoc').innerHTML=isL?atsLetter():atsCv();
+ const old=document.title;
+ document.title=`${isL?'Lettre':'CV'}-ATS-${D.prenom||''}-${D.nom||''}`.replace(/\s+/g,'-');
+ document.body.classList.add('ats-print');
+ toast('Choisis « Enregistrer au format PDF » : le texte restera lisible par les robots.');
+ setTimeout(()=>{window.print();document.title=old},300);
+};
+addEventListener('afterprint',()=>document.body.classList.remove('ats-print'));
 /* export */
 $('print').onclick=()=>window.print();
 $('pdf').onclick=async()=>{
