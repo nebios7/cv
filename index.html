@@ -34,16 +34,19 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
 .let-obj{margin-bottom:18px;padding:8px 12px;background:var(--peach);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
 .let-body p{margin:0 0 14px;white-space:pre-line;text-align:justify}.let-sign{margin-top:26px;font-weight:900;font-size:18px}
 #printDoc{display:none}
-#printDoc.measuring{display:block;position:absolute;left:-99999px;top:0;width:210mm}
+#printDoc.measuring{display:block;position:absolute;left:-99999px;top:0;width:calc(210mm - 2*var(--mx,9mm))}
 #printDoc.measuring .pgx{height:auto}
-.pgx{width:210mm;background:#fff;color:#000;box-sizing:border-box}
-.pgx .cv-body,.pgx .let-body{padding-bottom:0}
+.pgx{width:calc(210mm - 2*var(--mx,9mm));background:#fff;color:#000;box-sizing:border-box}
+.pgx .cv-head{margin:0 6px 8px 0;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:22px 24px}
+.pgx.p1{padding-top:9mm}
+.pgx.lt .cv-head{padding:14px 20px}.pgx.lt .cv-head h1{font-size:28px}.pgx.lt .cv-head p{margin-top:8px;font-size:15px}.pgx.lt .contact{margin-top:8px}.pgx.lt .let-body{font-size:14px;line-height:1.5}.pgx.lt .let-body p{margin-bottom:11px}.pgx.lt .let-meta{margin-bottom:16px}.pgx.lt .let-sign{margin-top:18px}
+.pgx .cv-body,.pgx .let-body{padding-bottom:0;padding-left:0;padding-right:0}
 .pgx.pn .cv-body,.pgx.pn .let-body{padding-top:14mm}
 .pgx .cv-body>:first-child{margin-top:0}
 .sg{margin-top:22px}
 @media print{body.pdoc>*:not(#printDoc){display:none!important}
 body.pdoc #printDoc{display:block!important}
-#printDoc .pgx{height:296mm;overflow:hidden;break-after:page;page-break-after:always}
+#printDoc .pgx{height:282mm;overflow:visible;break-after:page;page-break-after:always}
 #printDoc .pgx:last-child{break-after:auto;page-break-after:auto}}
 #atsDoc{display:none}
 @media print{body.ats-print>*:not(#atsDoc){display:none!important}
@@ -77,7 +80,7 @@ body.ats-print #atsDoc{display:block!important;font-family:Arial,Helvetica,sans-
 .pdfmode .job,.pdfmode .sec h3,.pdfmode .cv-head{page-break-inside:avoid;break-inside:avoid}.pdfmode .sec h3{page-break-after:avoid;break-after:avoid}
 .exporting{height:auto!important;overflow:visible!important;display:block!important}.exporting header,.exporting .stack,.exporting #toast{display:none!important}.exporting main{display:block!important;padding:0!important;max-width:none!important;width:794px!important;margin:0!important}.exporting .preview{overflow:visible!important;height:auto!important;padding:0!important}
 @media print{
- @page{size:A4;margin:0}
+ @page{size:A4;margin:0 9mm 14mm 9mm}
  body{background:#fff}header,.stack,#toast{display:none!important}
  body{height:auto!important;overflow:visible!important;display:block!important}html{height:auto!important}main{display:block;padding:0;max-width:none;height:auto}.preview{overflow:visible!important;height:auto!important;padding:0!important}
  .paper{border:0;box-shadow:none;max-width:none;min-height:0}
@@ -317,11 +320,14 @@ $('ats').onclick=()=>{
  toast('Choisis « Enregistrer au format PDF » : le texte restera lisible par les robots.');
  setTimeout(()=>{window.print();document.title=old},300);
 };
-addEventListener('afterprint',()=>{document.body.classList.remove('ats-print','pdoc');const st=document.getElementById('atsPage');if(st)st.textContent=''});
+addEventListener('afterprint',()=>{document.body.classList.remove('ats-print','pdoc');const st=document.getElementById('atsPage');if(st)st.textContent='';const ps=document.getElementById('pgStyle');if(ps)ps.textContent=''});
 /* export */
 function buildPrint(){
  const el=$(TAB==='let'?'letter':'cv'),isL=el.id==='letter',host=$('printDoc');
  const dens=el.className.replace(/\bpaper\b|\bpdfmode\b/g,'').trim();
+ const X=isL?18:9;host.style.setProperty('--mx',X+'mm');
+ let ps=document.getElementById('pgStyle');if(!ps){ps=document.createElement('style');ps.id='pgStyle';document.head.appendChild(ps)}
+ ps.textContent=`@media print{@page{size:A4;margin:0 ${X}mm 14mm ${X}mm}}`;
  host.innerHTML='';host.className='measuring '+dens;
  const head=el.querySelector('.cv-head').outerHTML,bodyCls=isL?'let-body':'cv-body',units=[];
  if(isL)[...el.querySelector('.let-body').children].forEach(c=>units.push(c.outerHTML));
@@ -329,7 +335,7 @@ function buildPrint(){
   units.push(`<div class="sg">${k[0].outerHTML}${k[1]?k[1].outerHTML:''}</div>`);
   k.slice(2).forEach(c=>units.push(c.outerHTML))});
  const LIM=(297-14)*96/25.4;
- const mk=first=>{const pg=document.createElement('div');pg.className='pgx'+(first?'':' pn');pg.innerHTML=(first?head:'')+`<div class="${bodyCls}"></div>`;host.appendChild(pg);return pg};
+ const mk=first=>{const pg=document.createElement('div');pg.className='pgx'+(first?' p1':' pn')+(isL?' lt':'');pg.innerHTML=(first?head:'')+`<div class="${bodyCls}"></div>`;host.appendChild(pg);return pg};
  let pg=mk(true),body=pg.lastChild;
  units.forEach(u=>{
   body.insertAdjacentHTML('beforeend',u);
