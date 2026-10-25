@@ -37,7 +37,7 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
 .paper{background:#fff;border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink);border-radius:4px;width:100%;max-width:794px;margin:auto;min-height:1000px;color:#000}
 .cv-head{background:var(--peach);border-bottom:3px solid var(--ink);padding:28px 34px;display:flex;gap:22px;align-items:center}
 .cv-head>div:first-child{flex:1;min-width:0}
-.ph{width:116px;height:116px;min-width:116px;flex:none;overflow:hidden;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);background:#fff;margin:0 8px 8px 0}.ph img{width:100%;height:100%;object-fit:cover;object-position:50% 25%;display:block;transform-origin:center}input[type=range]{padding:0;border:0;box-shadow:none;accent-color:#000;background:transparent}
+.ph{width:104px;height:130px;min-width:104px;flex:none;overflow:hidden;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);background:#fff;margin:0 8px 8px 0}.ph img{width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block;transform-origin:center}input[type=range]{padding:0;border:0;box-shadow:none;accent-color:#000;background:transparent}
 .cv-head h1{margin:0;font-size:36px;line-height:1.1;font-weight:900}
 .cv-head h1 b{background:var(--orange);padding:0 8px;border:3px solid var(--ink);display:inline-block;margin-left:4px;box-shadow:4px 4px 0 var(--ink)}
 .cv-head p{margin:12px 0 0;font-size:18px;font-weight:700}
@@ -168,7 +168,7 @@ function fill(){fillX();F.forEach(f=>$(f).value=D[f]||'');$('pz').value=D.pz||1.
 F.forEach(f=>$(f).oninput=()=>{D[f]=$(f).value;draw()});
 $('pal').onchange=()=>{D.pal=$('pal').value;draw()};
 /* photo */
-$('photo').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=400,c=document.createElement('canvas');c.width=c.height=s;const m=Math.min(im.width,im.height);c.getContext('2d').drawImage(im,(im.width-m)/2,(im.height-m)*0.2,m,m,0,0,s,s);D.pz=1.1;D.px=0;D.py=0;$('pz').value=1.1;$('px').value=0;$('py').value=0;D.photo=c.toDataURL('image/jpeg',.85);draw()};im.src=r.result};r.readAsDataURL(f)};
+$('photo').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,560/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);D.pz=1;D.px=0;D.py=0;$('pz').value=1;$('px').value=0;$('py').value=0;D.photo=c.toDataURL('image/jpeg',.85);draw()};im.src=r.result};r.readAsDataURL(f)};
 $('nophoto').onclick=()=>{D.photo='';$('photo').value='';draw()};
 ['pz','px','py'].forEach(id=>$(id).oninput=()=>{D[id]=+$(id).value;draw()});
 /* rendu CV */
