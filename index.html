@@ -141,18 +141,34 @@ const LISTS={
 };
 const CV_ORDER=[['exps','Expériences'],['projets','Projets'],['contribs','Contributions'],['forms','Formation'],['certifs','Certifications'],['ress','Ressources']];
 const PAL={orange:['#FFC480','#FCA847','#5CF1A4','#53B4FF'],bleu:['#BFE3FF','#53B4FF','#A7F3D0','#FFC480'],vert:['#B9F6CA','#5CF1A4','#FFC480','#53B4FF'],rose:['#FFC2D1','#FE4A60','#5CF1A4','#C4B5FD']};
-const SAMPLE={l_salut:'Madame, Monsieur,',l_ton:'formel',l_type:'emploi',l_poste:'Développeuse web',l_ent:'Entreprise Exemple',dens:'normal',hide:{},prenom:'Camille',nom:'Dupont',titre:'Développeuse web',email:'camille.dupont@exemple.fr',tel:'06 12 34 56 78',ville:'Bordeaux',pal:'orange',photo:'',
-resume:'Développeuse curieuse et rigoureuse, j’aime transformer des idées en outils simples et utiles.',
-comp:'JavaScript, HTML / CSS, React, SQL, Git, Travail en équipe',langues:'Français (natif), Anglais (B2)',interets:'Open source, Photographie, Randonnée',
-liens:[{poste:'GitHub',url:'github.com/camille'},{poste:'LinkedIn',url:'linkedin.com/in/camille'}],
-exps:[{poste:'Développeuse front-end',lieu:'Studio Pixel',periode:'2022 – 2025',desc:'Conception d’interfaces React.\nMise en place de tests et d’intégration continue.'}],
-projets:[{poste:'Mon portfolio',lieu:'HTML, CSS, JS',url:'camille.dev',desc:'Site personnel présentant mes réalisations.'}],
-contribs:[{poste:'Correctifs de documentation',lieu:'Projet open source',url:'',desc:'Traduction et corrections de la documentation.'}],
-forms:[{poste:'Master MIAGE',lieu:'Université de Bordeaux',periode:'2020 – 2022',desc:''}],
+const SAMPLE={l_salut:'Madame, Monsieur,',l_ton:'formel',l_type:'emploi',l_poste:'Professeur contractuel de Technologie (L1400)',l_ent:'',
+l_motiv:'Je souhaite transmettre la technologie aux élèves de collège : conception d’objets techniques, électronique, robotique et programmation, dans le respect des valeurs de la République et des principes du service public.',
+l_atout:'mon expérience en développement logiciel, en bases de données et en sécurité des applications',dens:'normal',hide:{},
+prenom:'Mohamed',nom:'Abdessemed',titre:'Programmeur — candidat Professeur contractuel de Technologie',email:'contact.abdessemed@gmail.com',tel:'06 52 90 96 62',ville:'Bordeaux',pal:'orange',photo:'',
+resume:'Programmeur titulaire d’un Master MIAGE et d’une Licence Informatique, avec une expérience en développement logiciel, bases de données et sécurité des applications. Motivé par la transmission de la technologie, de la conception d’objets techniques, électronique, robotique et de la programmation aux élèves de collège, dans le respect des valeurs de la République et des principes du service public.\nDiscipline visée : Technologie (L1400).',
+comp:'Python, C#, JavaScript, SQL, PostgreSQL, DB2, Linux, Git, Docker',langues:'Anglais (niveau professionnel)',interets:'',
+liens:[{poste:'GitHub',url:'github.com/nebios7'},{poste:'PyPI',url:'pypi.org/user/eurocybersecurite'}],
+exps:[
+{poste:'Consultant',lieu:'Eurocybersecurite',periode:'2023–2025',desc:'• Développement et optimisation d’applications et de chaînes de traitement logicielles.\n• Mise en place du versioning et de l’intégration continue (CI/CD).\n• Sécurisation des applications : authentification, contrôle d’accès, validation des données.'},
+{poste:'Développeur mobile / web (stage)',lieu:'Alsace Navette',periode:'2019',desc:'• Développement d’applications mobile (React Native) et web (C#, PHP) ; optimisation des bases de données ; déploiement sur 1&1 et AWS.'},
+{poste:'Développeur d’applications internes (stage)',lieu:'Proxiad Strasbourg',periode:'2018',desc:'• Développement et maintenance d’applications COBOL (Z/OS, DB2) pour le Crédit Mutuel ; traitements batch.'}],
+projets:[
+{poste:'Naim',lieu:'Python, Swift, LoRA',url:'github.com/nebios7/naim',desc:'Assistant de programmation open source, exécuté en local. Moteur Python, application macOS (Swift), interface web, système de plugins ; modèle de 9 milliards de paramètres entraîné par LoRA.'},
+{poste:'SecPro',lieu:'Python, PyPI, CI/CD',url:'',desc:'Outil d’audit de sécurité. Publié sur PyPI, intégrable en CI/CD.'},
+{poste:'Master MIAGE — Modèles 1.0 et 2.0',lieu:'Flask, React.js',url:'',desc:'Application web de prédiction, API sécurisée, tableau de bord, déploiement.'},
+{poste:'Entraînement de modèles de 3B à 8B de paramètres (en cours)',lieu:'GPU Apple Silicon',url:'',desc:'Préparation des données, entraînement et évaluation sur GPU Apple Silicon.'},
+{poste:'Publications : 7 packages sur PyPI',lieu:'',url:'pypi.org/user/eurocybersecurite',desc:''}],
+contribs:[],
+forms:[
+{poste:'Master MIAGE',lieu:'Université de Bordeaux',periode:'2023–2024',desc:''},
+{poste:'Licence Informatique, parcours Programmation orientée objet',lieu:'Université de Haute Alsace',periode:'2019',desc:''},
+{poste:'Diplôme Universitaire Développeur Grand Système',lieu:'Université de Haute Alsace',periode:'2018',desc:''},
+{poste:'Fabrication mécanique (FM)',lieu:'Université de Batna (Algérie)',periode:'1997–1999',desc:'Travaux d’atelier : liaison de machines-outils (tour, fraiseuse) à un ordinateur sous Unix ; programmation en Fortran (génération de programmes d’usinage en code ISO / G-code) et en VBA.'},
+{poste:'Tronc commun Technologie (TCT)',lieu:'Université de Batna (Algérie), faculté d’ingénieurs',periode:'1997',desc:''}],
 certifs:[],ress:[]};
 const clone=o=>JSON.parse(JSON.stringify(o));
 let D=clone(SAMPLE);
-try{const s=localStorage.getItem('cv-data-2');if(s)D=Object.assign(clone(SAMPLE),JSON.parse(s))}catch(e){}
+try{const s=localStorage.getItem('cv-data-2');if(s){const sv=JSON.parse(s);D=(sv.prenom==='Camille'&&sv.nom==='Dupont')?Object.assign(clone(SAMPLE),{photo:sv.photo||'',pz:sv.pz,px:sv.px,py:sv.py,pal:sv.pal||'orange',dens:sv.dens||'normal'}):Object.assign(clone(SAMPLE),sv)}}catch(e){}
 const F=['prenom','nom','titre','email','tel','ville','resume','comp','langues','interets'];
 function save(){try{localStorage.setItem('cv-data-2',JSON.stringify(D))}catch(e){}}
 function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',3500)}
@@ -215,7 +231,7 @@ function genBody(){
  else P.push(`Votre annonce${D.l_source?` parue sur ${D.l_source}`:''} pour le poste de ${poste}${ent?` chez ${ent}`:''} a retenu toute mon attention, et je vous adresse ma candidature.`);
  const comp=(D.comp||'').split(',').map(x=>x.trim()).filter(Boolean).slice(0,5).join(', ');
  const e=(D.exps||[]).find(o=>o.poste||o.lieu),f=(D.forms||[]).find(o=>o.poste||o.lieu);
- let p2=`${D.titre?`En tant que ${D.titre.toLowerCase()}`:'Au fil de mon parcours'}${e?`, notamment chez ${e.lieu||'mon dernier employeur'}${e.poste?` en qualité de ${e.poste.toLowerCase()}`:''}`:''}, j’ai développé des compétences solides${comp?` : ${comp}`:''}.`;
+ const tt=(D.titre||'').split(/\s[—–-]\s/)[0].trim();let p2=`${tt?`En tant que ${tt.toLowerCase()}`:'Au fil de mon parcours'}${e?`, notamment chez ${e.lieu||'mon dernier employeur'}${e.poste?` en qualité de ${e.poste.toLowerCase()}`:''}`:''}, j’ai développé des compétences solides${comp?` : ${comp}`:''}.`;
  if(f)p2+=` Ma formation (${f.poste}${f.lieu?`, ${f.lieu}`:''}) complète ce profil.`;
  P.push(p2);
  const pr=(D.projets||[]).find(o=>o.poste),ct=(D.contribs||[]).find(o=>o.poste);
