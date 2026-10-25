@@ -95,7 +95,7 @@ body.ats-print #atsDoc{display:block!important;font-family:Arial,Helvetica,sans-
   <label>Palette de couleurs</label><select id="pal"><option value="orange">Orange (gitingest)</option><option value="bleu">Bleu</option><option value="vert">Vert</option><option value="rose">Rose</option></select>
   <label>Densité</label><select id="dens"><option value="compact">Compact</option><option value="normal">Normal</option><option value="aere">Aéré</option></select>
   <label>Sections affichées</label><div id="secs"></div>
-  <div class="bar" style="margin-top:16px"><button class="white" id="exp">Sauvegarder (.json)</button><button class="white" id="imp">Charger (.json)</button><button class="white" id="reset">Tout effacer</button></div>
+  <div class="bar" style="margin-top:16px"><button class="white" id="exp">Sauvegarder (.json)</button><button class="white" id="imp">Charger (.json)</button><button class="white" id="defaults">↺ Valeurs par défaut</button><button class="white" id="reset">Tout effacer</button></div>
   <input type="file" id="file" accept=".json" style="display:none">
  </div>
 </div>
@@ -168,9 +168,9 @@ forms:[
 certifs:[],ress:[]};
 const clone=o=>JSON.parse(JSON.stringify(o));
 let D=clone(SAMPLE);
-try{const s=localStorage.getItem('cv-data-2');if(s){const sv=JSON.parse(s);D=(sv.prenom==='Camille'&&sv.nom==='Dupont')?Object.assign(clone(SAMPLE),{photo:sv.photo||'',pz:sv.pz,px:sv.px,py:sv.py,pal:sv.pal||'orange',dens:sv.dens||'normal'}):Object.assign(clone(SAMPLE),sv)}}catch(e){}
+try{const s=localStorage.getItem('cv-data-3');if(s){D=Object.assign(clone(SAMPLE),JSON.parse(s))}else{const o=localStorage.getItem('cv-data-2');if(o){const sv=JSON.parse(o);D=Object.assign(clone(SAMPLE),{photo:sv.photo||'',pz:sv.pz,px:sv.px,py:sv.py,pal:sv.pal||'orange',dens:sv.dens||'normal'})}}}catch(e){}
 const F=['prenom','nom','titre','email','tel','ville','resume','comp','langues','interets'];
-function save(){try{localStorage.setItem('cv-data-2',JSON.stringify(D))}catch(e){}}
+function save(){try{localStorage.setItem('cv-data-3',JSON.stringify(D))}catch(e){}}
 function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',3500)}
 /* formulaires dynamiques */
 Object.keys(LISTS).forEach(k=>{const c=document.createElement('div');c.className='card';c.innerHTML=`<h2>${LISTS[k].t}</h2><div id="l-${k}"></div><button class="add" data-add="${k}">+ Ajouter ${LISTS[k].n}</button>`;$('lists').appendChild(c)});
@@ -316,6 +316,7 @@ $('pdf').onclick=async()=>{
 $('exp').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(D,null,1)],{type:'application/json'}));a.download='cv-donnees.json';a.click()}catch(e){toast('Sauvegarde bloquée ici.')}};
 $('imp').onclick=()=>$('file').click();
 $('file').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{D=Object.assign(clone(SAMPLE),JSON.parse(r.result));fill();draw();toast('Données chargées.')}catch(x){toast('Fichier invalide.')}};r.readAsText(f)};
+$('defaults').onclick=()=>{const k={photo:D.photo,pz:D.pz,px:D.px,py:D.py,pal:D.pal,dens:D.dens};D=Object.assign(clone(SAMPLE),k);D.l_body=genBody();fill();draw();toast('Valeurs par défaut rétablies.')};
 $('reset').onclick=()=>{const pal=D.pal;D={pal,photo:''};Object.keys(LISTS).forEach(k=>D[k]=[]);fill();draw()};
 if(!D.l_body)D.l_body=genBody();
 fill();draw();tab('cv');
