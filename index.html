@@ -128,7 +128,7 @@ body.ats-print #atsDoc{display:block!important;font-family:Arial,Helvetica,sans-
 <div id="toast"></div>
 <script>
 const $=id=>document.getElementById(id);
-const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc=s=>String(s==null?'':s).replace(/[\u200b-\u200d\ufeff\u2060]/g,'').replace(/[\u00a0\u202f\u2009]/g,' ').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const href=u=>/^https?:\/\//i.test(u)?u:'https://'+u;
 const lnk=(u,t)=>u?`<a href="${esc(href(u))}">${t||esc(u.replace(/^https?:\/\//i,''))}</a>`:'';
 const LISTS={
@@ -297,7 +297,7 @@ $('ats').onclick=()=>{
  const isL=TAB==='let';
  $('atsDoc').innerHTML=isL?atsLetter():atsCv();
  const old=document.title;
- document.title=`${isL?'Lettre':'CV'}-ATS-${D.prenom||''}-${D.nom||''}`.replace(/\s+/g,'-');
+ document.title=`${isL?'Lettre':'CV'} - ${D.prenom||''}-${D.nom||''}`;
  let st=document.getElementById('atsPage');if(!st){st=document.createElement('style');st.id='atsPage';document.head.appendChild(st)}
  st.textContent='@media print{@page{size:A4;margin:16mm 18mm}@page :first{size:A4;margin:16mm 18mm}}';
  document.body.classList.add('ats-print');
@@ -306,7 +306,7 @@ $('ats').onclick=()=>{
 };
 addEventListener('afterprint',()=>{document.body.classList.remove('ats-print');const st=document.getElementById('atsPage');if(st)st.textContent=''});
 /* export */
-$('print').onclick=()=>window.print();
+$('print').onclick=()=>{const isL=TAB==='let',old=document.title;document.title=`${isL?'Lettre':'CV'} - ${D.prenom||''}-${D.nom||''}`;window.print();document.title=old};
 $('pdf').onclick=async()=>{
  if(!window.html2pdf){toast('Export PDF indisponible ici : utilise « Imprimer » puis « Enregistrer au format PDF ».');return}
  const el=$(TAB==='let'?'letter':'cv');el.classList.add('pdfmode');document.documentElement.classList.add('exporting');document.body.classList.add('exporting');window.scrollTo(0,0);toast('Génération du PDF…');
