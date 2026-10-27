@@ -145,6 +145,8 @@ body.ats-print #atsDoc{display:block!important;font-family:Arial,Helvetica,sans-
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[\u200b-\u200d\ufeff\u2060]/g,'').replace(/[\u00a0\u202f\u2009]/g,' ').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rich=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+const plain=s=>String(s==null?'':s).replace(/\*\*/g,'');
 const href=u=>/^https?:\/\//i.test(u)?u:'https://'+u;
 const lnk=(u,t)=>u?`<a href="${esc(href(u))}">${t||esc(u.replace(/^https?:\/\//i,''))}</a>`:'';
 const LISTS={
@@ -160,7 +162,7 @@ const CV_ORDER=[['exps','Expériences'],['projets','Projets'],['contribs','Contr
 const PAL={orange:['#FFC480','#FCA847','#5CF1A4','#53B4FF'],bleu:['#BFE3FF','#53B4FF','#A7F3D0','#FFC480'],vert:['#B9F6CA','#5CF1A4','#FFC480','#53B4FF'],rose:['#FFC2D1','#FE4A60','#5CF1A4','#C4B5FD']};
 const SAMPLE={l_salut:'Madame, Monsieur,',l_ton:'formel',l_type:'emploi',l_poste:'Professeur contractuel de Technologie (L1400)',l_dest:'Rectorat de l’académie de Bordeaux',l_ent:'Collège Georges Lapierre – À l’attention de Madame / Monsieur le/la chef(fe) d’établissement',l_adr:'Rue Pierre Brossolette, 33305 Lormont Cedex',l_ville:'Bordeaux',l_date:'18 octobre 2026',l_objet:'candidature au poste de professeur(e) contractuel(le) de Technologie (réf. MENJ-04-2026-48648)',l_body:'Je vous adresse ma candidature au poste de professeur contractuel de Technologie au collège Georges Lapierre de Lormont. Titulaire d’une Licence Informatique et d’un Master MIAGE, je remplis la condition de diplôme exigée par l’offre.\n\nProgrammeur de métier, je souhaite aujourd’hui mettre mes compétences au service de l’enseignement de la technologie. Cette discipline, qui associe la conception d’objets techniques, l’informatique et la programmation, correspond à mon parcours. Mes études initiales en fabrication mécanique, durant lesquelles j’ai relié des machines-outils à un ordinateur, m’ont donné le goût du lien entre l’objet technique et le programme qui le pilote.\n\nJe débute dans l’enseignement en établissement scolaire et j’aborde ce métier avec sérieux. Je m’appuierai sur les programmes officiels et sur l’équipe pédagogique, avec une attention constante à la diversité des élèves, à leurs progrès et au dialogue avec les familles.\n\nJe partage les missions de l’École et les valeurs de la République. Je m’engage à respecter la stricte neutralité politique et religieuse, à refuser toute discrimination et à agir avec esprit de responsabilité et recherche du bien commun.\n\nJe vous remercie de l’attention portée à ma candidature et reste à votre disposition pour un entretien.\n\nJe vous prie d’agréer, Madame, Monsieur, l’expression de mes salutations distinguées.',dens:'normal',hide:{},
 prenom:'Mohamed',nom:'ABDESSEMED',titre:'Programmeur — candidat Professeur contractuel de Technologie',email:'contact.abdessemed@gmail.com',tel:'06 52 90 96 62',ville:'Bordeaux',pal:'orange',photo:'',
-resume:'Programmeur titulaire d’un Master MIAGE et d’une Licence Informatique, avec une expérience en développement logiciel, bases de données et sécurité des applications. Motivé par la transmission de la technologie, de la conception d’objets techniques, électronique, robotique et de la programmation aux élèves de collège, dans le respect des valeurs de la République et des principes du service public.\nDiscipline visée : Technologie (L1400).',
+resume:'Programmeur titulaire d’un Master MIAGE et d’une Licence Informatique, avec une expérience en développement logiciel, bases de données et sécurité des applications. Motivé par la transmission de la technologie, de la conception d’objets techniques, électronique, robotique et de la programmation aux élèves de collège, dans le respect des valeurs de la République et des principes du service public.\n**Discipline visée : Technologie (L1400).**',
 comp:'Python, C#, JavaScript, SQL, PostgreSQL, DB2, Linux, Git, Docker',langues:'Anglais (niveau professionnel)',interets:'',
 liens:[{poste:'GitHub',url:'github.com/nebios7'},{poste:'PyPI',url:'pypi.org/user/eurocybersecurite'}],
 exps:[
@@ -208,7 +210,7 @@ $('photo').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileR
 $('nophoto').onclick=()=>{D.photo='';$('photo').value='';draw()};
 ['pz','px','py'].forEach(id=>$(id).oninput=()=>{D[id]=+$(id).value;draw()});
 /* rendu CV */
-const job=o=>`<div class="job"><div class="t"><span>${esc(o.poste)}</span>${o.periode?`<em>${esc(o.periode)}</em>`:''}</div>${o.lieu?`<div class="s">${esc(o.lieu)}</div>`:''}${o.url?`<div class="u">${lnk(o.url)}</div>`:''}${o.desc?`<p>${esc(o.desc)}</p>`:''}</div>`;
+const job=o=>`<div class="job"><div class="t"><span>${esc(o.poste)}</span>${o.periode?`<em>${esc(o.periode)}</em>`:''}</div>${o.lieu?`<div class="s">${esc(o.lieu)}</div>`:''}${o.url?`<div class="u">${lnk(o.url)}</div>`:''}${o.desc?`<p>${rich(o.desc)}</p>`:''}</div>`;
 const chips=s=>(s||'').split(',').map(x=>x.trim()).filter(Boolean).map(x=>`<span>${esc(x)}</span>`).join('');
 const sec=(t,h)=>h&&!(D.hide||{})[t]?`<div class="sec"><h3>${t}</h3>${h}</div>`:'';
 function drawCv(){
@@ -217,7 +219,7 @@ function drawCv(){
  const ct=[D.email,D.tel,D.ville].filter(Boolean).map(s=>`<span>${esc(s)}</span>`).join('')+
   (D.liens||[]).filter(l=>l.url).map(l=>`<span>${lnk(l.url,esc(l.poste||l.url))}</span>`).join('');
  const body=[
-  D.resume?sec('Profil',`<div class="sum">${esc(D.resume)}</div>`):'',
+  D.resume?sec('Profil',`<div class="sum">${rich(D.resume)}</div>`):'',
   sec('Compétences',chips(D.comp)&&`<div class="chips">${chips(D.comp)}</div>`),
   ...CV_ORDER.map(([k,t])=>sec(t,(D[k]||[]).filter(o=>o.poste||o.lieu).map(job).join(''))),
   sec('Langues',chips(D.langues)&&`<div class="chips">${chips(D.langues)}</div>`),
@@ -269,7 +271,7 @@ function drawLetter(){
  const dest=[D.l_dest,D.l_ent,D.l_adr].filter(Boolean).map(esc).join('<br>');
  const type=D.l_type||'emploi',poste=D.l_poste||D.titre||'';
  const objet=D.l_objet||(poste?(type==='spontanee'?`Candidature spontanée – ${poste}`:type==='stage'?`Candidature stage / alternance – ${poste}`:`Candidature au poste de ${poste}`):'');
- const paras=(D.l_body||'').split(/\n{2,}/).filter(x=>x.trim()).map(x=>`<p>${esc(x.trim())}</p>`).join('');
+ const paras=(D.l_body||'').split(/\n{2,}/).filter(x=>x.trim()).map(x=>`<p>${rich(x.trim())}</p>`).join('');
  $('letter').innerHTML=`<div class="cv-head"><div><h1>${esc(D.prenom)||'Prénom'} <b>${esc((D.nom||'NOM').toUpperCase())}</b></h1>${D.titre?`<p>${esc(D.titre)}</p>`:''}<div class="contact">${ct}</div></div>${D.photo?`<div class="ph"><img src="${D.photo}" alt="" style="transform:translate(${D.px||0}%,${D.py||0}%) scale(${D.pz||1.1})"></div>`:''}</div>
  <div class="let-body"><div class="let-meta"><div class="let-dest">${dest}</div><div class="let-date">${ville?esc(ville)+', le ':'Le '}${esc(date)}</div></div>
  ${objet?`<div class="let-obj"><b>Objet :</b> ${esc(objet)}</div>`:''}
@@ -285,14 +287,14 @@ function tab(t){TAB=t;const c=t==='cv';
 $('tabCv').onclick=()=>tab('cv');$('tabLet').onclick=()=>tab('let');
 /* version ATS */
 const atsSec=(t,h)=>h&&!(D.hide||{})[t]?`<h2>${t}</h2>${h}`:'';
-const atsJobs=a=>(a||[]).filter(o=>o.poste||o.lieu).map(o=>`<div class="aj"><p><b>${esc(o.poste)}</b>${o.lieu?` - ${esc(o.lieu)}`:''}${o.periode?` (${esc(o.periode)})`:''}</p>${o.url?`<p>${esc(href(o.url))}</p>`:''}${o.desc?`<p class="pl">${esc(o.desc)}</p>`:''}</div>`).join('');
+const atsJobs=a=>(a||[]).filter(o=>o.poste||o.lieu).map(o=>`<div class="aj"><p><b>${esc(o.poste)}</b>${o.lieu?` - ${esc(o.lieu)}`:''}${o.periode?` (${esc(o.periode)})`:''}</p>${o.url?`<p>${esc(href(o.url))}</p>`:''}${o.desc?`<p class="pl">${esc(plain(o.desc))}</p>`:''}</div>`).join('');
 const csv=x=>(x||'').split(',').map(v=>v.trim()).filter(Boolean).join(', ');
 function atsCv(){
  const nm=`${D.prenom||''} ${D.nom||''}`.trim();
  const ct=[D.email,D.tel,D.ville].filter(Boolean).map(esc).join(' | ');
  const lk=(D.liens||[]).filter(l=>l.url).map(l=>`${l.poste?esc(l.poste)+' : ':''}${esc(href(l.url))}`).join(' | ');
  return `<h1>${esc(nm)}</h1>${D.titre?`<p class="at">${esc(D.titre)}</p>`:''}${ct?`<p>${ct}</p>`:''}${lk?`<p>${lk}</p>`:''}`+
-  atsSec('Profil',D.resume?`<p class="pl">${esc(D.resume)}</p>`:'')+
+  atsSec('Profil',D.resume?`<p class="pl">${esc(plain(D.resume))}</p>`:'')+
   atsSec('Compétences',csv(D.comp)&&`<p>${esc(csv(D.comp))}</p>`)+
   atsSec('Expériences',atsJobs(D.exps))+atsSec('Projets',atsJobs(D.projets))+atsSec('Contributions',atsJobs(D.contribs))+
   atsSec('Formation',atsJobs(D.forms))+atsSec('Certifications',atsJobs(D.certifs))+atsSec('Ressources',atsJobs(D.ress))+
@@ -306,7 +308,7 @@ function atsLetter(){
  const objet=D.l_objet||(poste?(type==='spontanee'?`Candidature spontanée – ${poste}`:type==='stage'?`Candidature stage / alternance – ${poste}`:`Candidature au poste de ${poste}`):'');
  const me=[D.ville,D.email,D.tel].filter(Boolean).map(esc).join('<br>');
  const dest=[D.l_dest,D.l_ent,D.l_adr].filter(Boolean).map(esc).join('<br>');
- const paras=(D.l_body||'').split(/\n{2,}/).filter(x=>x.trim()).map(x=>`<p class="pl">${esc(x.trim())}</p>`).join('');
+ const paras=(D.l_body||'').split(/\n{2,}/).filter(x=>x.trim()).map(x=>`<p class="pl">${esc(plain(x.trim()))}</p>`).join('');
  return `<p><b>${esc(nm)}</b><br>${me}</p><p>${dest}</p><p>${ville?esc(ville)+', le ':'Le '}${esc(date)}</p>${objet?`<p><b>Objet :</b> ${esc(objet)}</p>`:''}<p>${esc(D.l_salut||'Madame, Monsieur,')}</p>${paras}<p><b>${esc(nm)}</b></p>`;
 }
 $('ats').onclick=()=>{
