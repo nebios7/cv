@@ -89,7 +89,7 @@ body.ats-print #atsDoc{display:block!important;font-family:Arial,Helvetica,sans-
 }
 </style></head><body>
 <header><h1>▸ Générateur de CV</h1>
-<div class="bar"><button id="tabCv" class="green">📄 CV</button><button id="tabLet" class="white">✉ Lettre</button><button id="print" class="white">🖨 Imprimer</button><button id="pdf" class="green">⬇ Télécharger PDF</button><button id="ats" class="white">🤖 Version ATS (PDF)</button></div></header>
+<div class="bar"><button id="tabCv" class="green">📄 CV</button><button id="tabLet" class="white">✉ Lettre</button><button id="bBold" class="white" title="Gras (Cmd/Ctrl+B) : sélectionne du texte, puis clique"><b>G</b></button><button id="bItal" class="white" title="Italique (Cmd/Ctrl+I) : sélectionne du texte, puis clique"><i>I</i></button><button id="print" class="white">🖨 Imprimer</button><button id="pdf" class="green">⬇ Télécharger PDF</button><button id="ats" class="white">🤖 Version ATS (PDF)</button></div></header>
 <main>
 <div class="stack">
 <div id="cvForm">
@@ -145,8 +145,8 @@ body.ats-print #atsDoc{display:block!important;font-family:Arial,Helvetica,sans-
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?'':s).replace(/[\u200b-\u200d\ufeff\u2060]/g,'').replace(/[\u00a0\u202f\u2009]/g,' ').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const rich=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
-const plain=s=>String(s==null?'':s).replace(/\*\*/g,'');
+const rich=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\*(.+?)\*/g,'<i>$1</i>');
+const plain=s=>String(s==null?'':s).replace(/\*{1,2}/g,'');
 const href=u=>/^https?:\/\//i.test(u)?u:'https://'+u;
 const lnk=(u,t)=>u?`<a href="${esc(href(u))}">${t||esc(u.replace(/^https?:\/\//i,''))}</a>`:'';
 const LISTS={
@@ -285,6 +285,16 @@ function tab(t){TAB=t;const c=t==='cv';
  $('tabCv').className=c?'green':'white';$('tabLet').className=c?'white':'green';
  document.querySelectorAll('.stack,.preview').forEach(e=>e.scrollTop=0)}
 $('tabCv').onclick=()=>tab('cv');$('tabLet').onclick=()=>tab('let');
+/* gras / italique */
+let lastTA=null;
+document.addEventListener('focusin',e=>{if(e.target.tagName==='TEXTAREA')lastTA=e.target});
+function wrapSel(mk){const t=lastTA;if(!t){toast('Clique d’abord dans un champ texte (profil, description, lettre), puis sélectionne le texte.');return}
+ const a=t.selectionStart,b=t.selectionEnd,v=t.value;
+ t.value=v.slice(0,a)+mk+v.slice(a,b)+mk+v.slice(b);
+ t.focus();t.setSelectionRange(a+mk.length,b+mk.length);
+ t.dispatchEvent(new Event('input',{bubbles:true}))}
+[['bBold','**'],['bItal','*']].forEach(([id,mk])=>{$(id).onmousedown=e=>e.preventDefault();$(id).onclick=()=>wrapSel(mk)});
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.target.tagName==='TEXTAREA'){const k=e.key.toLowerCase();if(k==='b'||k==='i'){e.preventDefault();lastTA=e.target;wrapSel(k==='b'?'**':'*')}}});
 /* version ATS */
 const atsSec=(t,h)=>h&&!(D.hide||{})[t]?`<h2>${t}</h2>${h}`:'';
 const atsJobs=a=>(a||[]).filter(o=>o.poste||o.lieu).map(o=>`<div class="aj"><p><b>${esc(o.poste)}</b>${o.lieu?` - ${esc(o.lieu)}`:''}${o.periode?` (${esc(o.periode)})`:''}</p>${o.url?`<p>${esc(href(o.url))}</p>`:''}${o.desc?`<p class="pl">${esc(plain(o.desc))}</p>`:''}</div>`).join('');
